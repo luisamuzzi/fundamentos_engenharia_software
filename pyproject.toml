@@ -1,0 +1,28 @@
+[project]
+name = "fundamentos_engenharia_software"
+version = "0.1.0"
+description = "Ambiente para projeto de fraude ML"
+authors = [
+    {name = "Luisa Muzzi",email = "luisamuzzi29@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "optuna (>=4.5.0,<5.0.0)",
+    "pandas (>=2.3.2,<3.0.0)",
+    "numpy (>=2.3.2,<3.0.0)",
+    "seaborn (>=0.13.2,<0.14.0)",
+    "matplotlib (>=3.10.5,<4.0.0)",
+    "scikit-learn (>=1.7.1,<2.0.0)",
+    "imbalanced-learn (>=0.14.0,<0.15.0)",
+    "scikit-optimize (>=0.10.2,<0.11.0)",
+    "ipykernel (>=6.30.1,<7.0.0)",
+    "missingno (>=0.5.2,<0.6.0)",
+    "openpyxl (>=3.1.5,<4.0.0)",
+    "requests (>=2.32.5,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
