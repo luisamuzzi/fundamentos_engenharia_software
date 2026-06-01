@@ -1,13 +1,13 @@
-from src.fundamentos_engenharia_software.collect.data_collect import (
-    collect_data,
-)
-from src.fundamentos_engenharia_software.preprocessing.feature_engineering import (
-    feature_engineering,
-)
+from src.fundamentos_engenharia_software.preprocessing.feature_engineering import create_features_and_encode
+from src.fundamentos_engenharia_software.preprocessing.impute_and_scale import impute_and_scale
+from src.fundamentos_engenharia_software.training.modeling import train_model
+from src.fundamentos_engenharia_software.evaluation.evaluation import evaluate_model
 
 def main():
-    collect_data()
-    feature_engineering()
+    create_features_and_encode()
+    impute_and_scale()
+    train_model()
+    evaluate_model()
 
 if __name__ == "__main__":
     main()
