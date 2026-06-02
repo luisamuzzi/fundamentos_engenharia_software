@@ -1,4 +1,7 @@
-import os
+"""
+Módulo de treinamento do modelo.
+"""
+
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from joblib import dump
@@ -12,6 +15,9 @@ from src.fundamentos_engenharia_software.config import (
 
 
 def train_model():
+    """
+    Função que treina o modelo e salva.
+    """
     X_train = pd.read_csv(X_TRAIN_IMPUTED_DATA_PATH)
     y_train = pd.read_csv(Y_TRAIN_DATA_PATH)
 

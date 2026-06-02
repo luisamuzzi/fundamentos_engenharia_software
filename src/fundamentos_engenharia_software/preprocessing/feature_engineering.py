@@ -1,3 +1,7 @@
+"""
+Módulo de feature engineering.
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
@@ -9,6 +13,9 @@ from src.fundamentos_engenharia_software.config import (
 
 
 def create_cumulative_fraud_percentage(df):
+    """
+    Função que calcula o percentual acumulado de fraude.
+    """
     df_copy = df.copy()
 
     item_cat = df_copy.categoria_produto.value_counts().reset_index()
@@ -34,6 +41,9 @@ def create_cumulative_fraud_percentage(df):
 
 
 def extract_least_frequent_categories(df, percentage_cutoff=80, top_n=685):
+    """
+    Função que extrai as categorias menos frequentes.
+    """
 
     df_copy = df.copy()
 
@@ -49,6 +59,9 @@ def extract_least_frequent_categories(df, percentage_cutoff=80, top_n=685):
 
 
 def create_other_category_values(df, lista_categorias_outros):
+    """
+    Função que cria a categoria outros.
+    """
     df_copy = df.copy()
 
     df_copy["grupo_categorias"] = df_copy["categoria_produto"]
@@ -61,7 +74,10 @@ def create_other_category_values(df, lista_categorias_outros):
     return df_copy
 
 
-def group_countries(df, countries_to_keep=["BR", "AR"]):
+def group_countries(df, countries_to_keep):
+    """
+    Função que agrupa as categorias.
+    """
     df_copy = df.copy()
 
     df_copy["paises_agrupados"] = np.where(
@@ -72,6 +88,9 @@ def group_countries(df, countries_to_keep=["BR", "AR"]):
 
 
 def create_document_columns(df):
+    """
+    Função que cria a coluna de documentos.
+    """
     df_copy = df.copy()
 
     df_copy["entrega_doc_2_nan"] = np.where(
@@ -88,9 +107,12 @@ def create_document_columns(df):
 
 
 def encode_categorical_columns(df):
+    """
+    Função que encoda as colunas categóricas.
+    """
     df_copy = df.copy()
 
-    cat = [col for col in df_copy.select_dtypes(include="object").columns]
+    cat = list(df_copy.select_dtypes(include="object").columns)
 
     le = LabelEncoder()
 
@@ -101,6 +123,9 @@ def encode_categorical_columns(df):
 
 
 def create_features_and_encode():
+    """
+    Função que chama todas as funções.
+    """
     df = pd.read_excel(RAW_DATA_PATH)
 
     df_with_percentage_column = create_cumulative_fraud_percentage(df)

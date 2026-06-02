@@ -37,3 +37,6 @@ dev = [
 
 [tool.black]
 line-length = 79
+
+[tool.pylint.'BASIC']
+good-names = ["X", "y", "df", "X_train", "X_test", "y_train", "y_test"]

@@ -1,4 +1,7 @@
-import os
+"""
+Módulo de avaliação.
+"""
+
 import joblib
 import pandas as pd
 from sklearn.metrics import roc_auc_score, precision_score, recall_score
@@ -15,6 +18,9 @@ from src.fundamentos_engenharia_software.config import (
 
 
 def load_data_and_artifacts():
+    """
+    Função que carrega dados e artefatos.
+    """
     model = joblib.load(MODEL_PATH)
 
     X_train = pd.read_csv(X_TRAIN_IMPUTED_DATA_PATH)
@@ -26,6 +32,9 @@ def load_data_and_artifacts():
 
 
 def make_predictions(model, X_train, X_test):
+    """
+    Função que realiza predições.
+    """
     y_train_proba_final = model.predict_proba(X_train[TOP_FEATURES])[:, 1]
     y_pred_proba_final = model.predict_proba(X_test[TOP_FEATURES])[:, 1]
     y_pred_final = model.predict(X_test[TOP_FEATURES])
@@ -36,6 +45,9 @@ def make_predictions(model, X_train, X_test):
 def calculate_metrics(
     y_train, y_test, y_train_proba_final, y_pred_proba_final, y_pred_final
 ):
+    """
+    Função que calcula métricas.
+    """
     train_auc = roc_auc_score(y_train, y_train_proba_final)
     test_auc = roc_auc_score(y_test, y_pred_proba_final)
     precision = precision_score(y_test, y_pred_final)
@@ -54,6 +66,9 @@ def calculate_metrics(
 
 
 def evaluate_model():
+    """
+    Função que chama todas as funções.
+    """
     model, X_train, X_test, y_train, y_test = load_data_and_artifacts()
     y_train_proba_final, y_pred_proba_final, y_pred_final = make_predictions(
         model, X_train, X_test

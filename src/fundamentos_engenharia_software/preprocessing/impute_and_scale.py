@@ -1,4 +1,7 @@
-import os
+"""
+Módulo que realiza impute e scaling.
+"""
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
@@ -15,6 +18,9 @@ from src.fundamentos_engenharia_software.config import (
 
 
 def read_and_split_data():
+    """
+    Função que lê e divide os dados.
+    """
     data_with_features = pd.read_csv(PROCESSED_DATA_PATH)
 
     X = data_with_features[COLS_TO_USE].drop(columns="fraude")
@@ -28,6 +34,9 @@ def read_and_split_data():
 
 
 def extract_missing_columns(X_train):
+    """
+    Função que extrai colunas com valores ausentes.
+    """
     cols_com_missing = X_train.select_dtypes(include="number").columns[
         X_train.select_dtypes(include="number").isna().sum() > 0
     ]
@@ -36,6 +45,9 @@ def extract_missing_columns(X_train):
 
 
 def scale_missing_columns(X_train, X_test, missing_columns):
+    """
+    Função que aplica scaling.
+    """
     scaler = MinMaxScaler()
 
     X_train_scaled = X_train[missing_columns].copy()
@@ -52,6 +64,9 @@ def scale_missing_columns(X_train, X_test, missing_columns):
 def impute_missing_data(
     X_train, X_test, X_train_scaled, X_test_scaled, missing_columns
 ):
+    """
+    Função que faz imputing de valores ausentes.
+    """
     imputer = KNNImputer(n_neighbors=5)
 
     X_train_num = X_train_scaled.copy()
@@ -76,6 +91,9 @@ def impute_missing_data(
 
 
 def impute_and_scale():
+    """
+    Função que chama todas as funções.
+    """
     X_train, X_test, y_train, y_test = read_and_split_data()
 
     missing_columns = extract_missing_columns(X_train)
