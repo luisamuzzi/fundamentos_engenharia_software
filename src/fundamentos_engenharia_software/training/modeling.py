@@ -3,14 +3,20 @@ import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from joblib import dump
 
-from src.fundamentos_engenharia_software.config import X_TRAIN_IMPUTED_DATA_PATH, Y_TRAIN_DATA_PATH, MODEL_PATH, TOP_FEATURES
+from src.fundamentos_engenharia_software.config import (
+    X_TRAIN_IMPUTED_DATA_PATH,
+    Y_TRAIN_DATA_PATH,
+    MODEL_PATH,
+    TOP_FEATURES,
+)
+
 
 def train_model():
     X_train = pd.read_csv(X_TRAIN_IMPUTED_DATA_PATH)
     y_train = pd.read_csv(Y_TRAIN_DATA_PATH)
 
     X_train_top = X_train[TOP_FEATURES]
-    
+
     dt_model_top = DecisionTreeClassifier(
         criterion="entropy",
         random_state=42,
