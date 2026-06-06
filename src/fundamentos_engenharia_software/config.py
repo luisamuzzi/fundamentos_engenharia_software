@@ -1,5 +1,28 @@
 """
-Módulo de configurações.
+Módulo de configurações do projeto.
+
+Este arquivo centraliza todas as variáveis de configuração, como caminhos de
+arquivos, diretórios e listas de features, para garantir consistência e
+facilitar a manutenção em todo o projeto.
+
+As constantes definidas incluem:
+
+Caminhos de Diretórios
+- PROJECT_ROOT: Caminho absoluto para a raiz do projeto.
+- DATA_FOLDER: Pasta principal de dados.
+- RAW_DATA_FOLDER: Subpasta para dados brutos.
+- PROCESSED_DATA_FOLDER: Subpasta para dados processados.
+- ARTIFACTS_FOLDER: Pasta para artefatos gerados (ex: modelos).
+
+Caminhos de Arquivos de Dados
+- Variáveis que apontam para os arquivos de dados brutos, processados e
+  os conjuntos de treino/teste já divididos e tratados.
+
+Parâmetros do Modelo
+- COLS_TO_USE: Lista de colunas a serem utilizadas do dataset original.
+- MODEL_PATH: Caminho completo para salvar/carregar o modelo treinado.
+- TOP_FEATURES: Lista das features mais importantes selecionadas para o
+                treinamento do modelo final.
 """
 
 import os

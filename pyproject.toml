@@ -39,4 +39,20 @@ dev = [
 line-length = 79
 
 [tool.pylint.'BASIC']
-good-names = ["X", "y", "df", "X_train", "X_test", "y_train", "y_test"]
+good-names = [
+        "X", 
+        "y", 
+        "df", 
+        "X_train", 
+        "X_test", 
+        "y_train", 
+        "y_test", 
+        "X_train_scaled", 
+        "X_test_scaled",
+        "X_train_num",
+        "X_test_num",
+        "X_train_imputed",
+        "X_test_imputed",
+        "X_train_copy",
+        "X_test_copy",
+        "X_train_top"]

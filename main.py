@@ -11,10 +11,13 @@ from src.fundamentos_engenharia_software.evaluation.evaluation import (
 
 
 def main():
-    create_features_and_encode()
-    impute_and_scale()
-    train_model()
-    evaluate_model()
+    try:
+        create_features_and_encode()
+        impute_and_scale()
+        train_model()
+        evaluate_model()
+    except Exception as exc:
+       print(f'Processo de treino interrompido devido a erro. {exc}') 
 
 
 if __name__ == "__main__":
