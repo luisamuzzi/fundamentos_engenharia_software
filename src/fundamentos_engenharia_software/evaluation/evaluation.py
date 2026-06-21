@@ -1,27 +1,21 @@
 """
-Módulo de avaliação de modelo.
+Módulo de avaliação de modelo utilizando uma abordagem Orientada a Objetos.
 
-Este módulo contém funções para carregar um modelo treinado e dados,
-realizar predições e calcular métricas de desempenho como AUC, KS,
-precisão e recall.
+A classe ModelEvaluator encapsula todo o processo de avaliação,
+incluindo o carregamento de artefatos, geração de predições e cálculo
+de métricas de desempenho.
 
-As principais funções são:
+Classes de Avaliação:
+- ModelEvaluator: Resgata os dados e avalia os resultados em teste.
 
-- load_data_and_artifacts: Carrega o modelo serializado e os DataFrames
-                           de treino/teste.
-- make_predictions: Utiliza o modelo para gerar predições nos dados.
-- calculate_metrics: Calcula e exibe as métricas de avaliação do
-                     modelo.
-evaluate_model: Orquestra o processo completo, chamando as outras
-                funções em sequência.
 """
 
-from typing import Any, Tuple
+from typing import Any, Dict
 import joblib
-import numpy as np
 import pandas as pd
-from sklearn.metrics import roc_auc_score, precision_score, recall_score
+import numpy as np
 from scipy.stats import ks_2samp
+from sklearn.metrics import roc_auc_score, precision_score, recall_score
 
 from src.fundamentos_engenharia_software.config import (
     MODEL_PATH,
@@ -33,121 +27,146 @@ from src.fundamentos_engenharia_software.config import (
 )
 
 
-def load_data_and_artifacts() -> (
-    Tuple[Any, pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]
-):
+class ModelEvaluator:
     """
-    Carrega o modelo treinado e os conjuntos de dados de treino e teste.
+    Encapsula o processo de avaliação do modelo de machine learning.
 
-    Lê o modelo serializado (joblib) e os arquivos CSV contendo os dados
-    processados para treino e teste.
+    :param model_path: Caminho para o arquivo do modelo (.joblib).
+    :type model_path: str
+    :param x_train_path: Caminho para o CSV de features de treino.
+    :type x_train_path: str
+    :param x_test_path: Caminho para o CSV de features de teste.
+    :type x_test_path: str
+    :param y_train_path: Caminho para o CSV de alvos de treino.
+    :type y_train_path: str
+    :param y_test_path: Caminho para o CSV de alvos de teste.
+    :type y_test_path: str
+    :param top_features: Lista com os nomes das features mais importantes.
+    :type top_features: list
 
-    :return: Uma tupla contendo o modelo, X_train, X_test, y_train e y_test.
-    :rtype: tuple(object, pd.DataFrame, pd.DataFrame, pd.Series, pd.Series)
+    :ivar model: O modelo de machine learning carregado.
+    :vartype model: Any
+    :ivar X_test: DataFrame com os dados de teste.
+    :vartype X_test: pandas.DataFrame
+    :ivar y_test: Series com os alvos de teste.
+    :vartype y_test: pandas.Series
+    :ivar metrics: Dicionário com os resultados da avaliação (AUC, KS, etc.).
+    :vartype metrics: dict[str, float]
     """
 
-    try:
-        print(f"Carregando modelo de {MODEL_PATH}")
-        model = joblib.load(MODEL_PATH)
+    def __init__(
+        self,
+        model_path: str,
+        x_train_path: str,
+        x_test_path: str,
+        y_train_path: str,
+        y_test_path: str,
+        top_features: list,
+    ):
+        self.model_path = model_path
+        self.x_train_path = x_train_path
+        self.x_test_path = x_test_path
+        self.y_train_path = y_train_path
+        self.y_test_path = y_test_path
+        self.top_features = top_features
 
-        print(f"Carregando dados de treino e teste")
-        X_train = pd.read_csv(X_TRAIN_IMPUTED_DATA_PATH)
-        X_test = pd.read_csv(X_TEST_IMPUTED_DATA_PATH)
-        y_train = pd.read_csv(Y_TRAIN_DATA_PATH).squeeze()
-        y_test = pd.read_csv(Y_TEST_DATA_PATH).squeeze()
+        self.model: Any = None
+        self.X_train: pd.DataFrame = None
+        self.X_test: pd.DataFrame = None
+        self.y_train: pd.Series = None
+        self.y_test: pd.Series = None
+        self.y_train_proba: np.ndarray = None
+        self.y_pred_proba: np.ndarray = None
+        self.y_pred: np.ndarray = None
+        self.metrics: Dict[str, float] = {}
 
-        return model, X_train, X_test, y_train, y_test
-    except FileNotFoundError as e:
-        print(f"Arquivo de modelo ou de dados não encontrado: {e}")
-        raise
-    except Exception as e:
-        print(f"Falha ao carregar artefatos: {e}")
-        raise
+    def _load_data_and_artifacts(self) -> None:
+        """
+        Carrega o modelo e os dados nos atributos da instância.
+        Método privado para uso interno da classe.
+        """
+        try:
+            print(f"Carregando modelo de {self.model_path}")
+            self.model = joblib.load(self.model_path)
 
+            print("Carregando dados de treino e teste")
+            self.X_train = pd.read_csv(self.x_train_path)
+            self.X_test = pd.read_csv(self.x_test_path)
+            self.y_train = pd.read_csv(self.y_train_path).squeeze()
+            self.y_test = pd.read_csv(self.y_test_path).squeeze()
+        except FileNotFoundError as e:
+            print(f"Arquivo de modelo ou de dados não encontrado: {e}")
+            raise
+        except Exception as e:
+            print(f"Falha ao carregar artefatos: {e}")
+            raise
 
-def make_predictions(
-    model: Any, X_train: pd.DataFrame, X_test: pd.DataFrame
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Gera predições usando o modelo treinado.
+    def _make_predictions(self) -> None:
+        """
+        Gera predições e as armazena nos atributos da instância.
+        Método privado para uso interno da classe.
+        """
 
-    Calcula as probabilidades preditas para os conjuntos de treino e teste,
-    e as classes preditas para o conjunto de teste, utilizando apenas as
-    features mais importantes (TOP_FEATURES).
+        print("Gerando predições...")
+        self.y_train_proba = self.model.predict_proba(
+            self.X_train[self.top_features]
+        )[:, 1]
+        self.y_pred_proba = self.model.predict_proba(
+            self.X_test[self.top_features]
+        )[:, 1]
+        self.y_pred = self.model.predict(self.X_test[self.top_features])
 
-    :param model: O modelo de machine learning treinado e carregado.
-    :type model: object
-    :param X_train: DataFrame com as features de treino.
-    :type X_train: pd.DataFrame
-    :param X_test: DataFrame com as features de teste.
-    :type X_test: pd.DataFrame
-    :return: Uma tupla com as probabilidades de treino, probabilidades de teste e
-             classes preditas para o teste.
-    :rtype: tuple(np.ndarray, np.ndarray, np.ndarray)
-    """
-    y_train_proba_final = model.predict_proba(X_train[TOP_FEATURES])[:, 1]
-    y_pred_proba_final = model.predict_proba(X_test[TOP_FEATURES])[:, 1]
-    y_pred_final = model.predict(X_test[TOP_FEATURES])
+    def _calculate_metrics(self) -> None:
+        """
+        Calcula as métricas de avaliação e as armazena no atributo 'metrics'.
+        Método privado para uso interno da classe.
+        """
 
-    return y_train_proba_final, y_pred_proba_final, y_pred_final
+        print("Calculando métricas...")
+        ks_stat, ks_p_value = ks_2samp(
+            self.y_pred_proba[self.y_test == 1],
+            self.y_pred_proba[self.y_test == 0],
+        )
 
+        self.metrics = {
+            "AUC Treino": roc_auc_score(self.y_train, self.y_train_proba),
+            "AUC Teste": roc_auc_score(self.y_test, self.y_pred_proba),
+            "KS Statistic": ks_stat,
+            "KS P-value": ks_p_value,
+            "Precision": precision_score(self.y_test, self.y_pred),
+            "Recall": recall_score(self.y_test, self.y_pred),
+        }
 
-def calculate_metrics(
-    y_train: pd.Series,
-    y_test: pd.Series,
-    y_train_proba_final: np.ndarray,
-    y_pred_proba_final: np.ndarray,
-    y_pred_final: np.ndarray,
-) -> None:
-    """
-    Calcula e exibe as métricas de avaliação do modelo.
+    def evaluate(self) -> Dict[str, float]:
+        """
+        Orquestra o processo completo de avaliação do modelo.
 
-    Temos as métricas:
-    - ROC AUC (para treino e teste)
-    - Estatística KS
-    - Precisão e recall (para teste)
-
-    :param y_train: Rótulos verdadeiros do conjunto de treino.
-    :type y_train: pd.Series
-    :param y_test: Rótulos verdadeiros do conjunto de teste.
-    :type y_test: pd.Series
-    :param y_train_proba_final: Probabilidades preditas para o conjunto de treino.
-    :type y_train_proba_final: np.ndarray
-    :param y_pred_proba_final: Probabilidades preditas para o conjunto de teste.
-    :type y_pred_proba_final: np.ndarray
-    :param y_pred_final: Classes preditas para o conjunto de teste.
-    :type y_pred_final: np.ndarray
-    """
-    train_auc = roc_auc_score(y_train, y_train_proba_final)
-    test_auc = roc_auc_score(y_test, y_pred_proba_final)
-    precision = precision_score(y_test, y_pred_final)
-    recall = recall_score(y_test, y_pred_final)
-
-    ks_stat, ks_p = ks_2samp(
-        y_pred_proba_final[y_test == 1], y_pred_proba_final[y_test == 0]
-    )
-
-    print(f"AUC Treino: {train_auc:.4f}")
-    print(f"AUC Teste: {test_auc:.4f}")
-    print(f"KS Statistic: {ks_stat:.4f}")
-    print(f"KS P-value: {ks_p:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall: {recall:.4f}")
+        :return: Um dicionário contendo as métricas calculadas.
+        """
+        self._load_data_and_artifacts()
+        self._make_predictions()
+        self._calculate_metrics()
+        return self.metrics
 
 
 def evaluate_model() -> None:
     """
-    Orquestra o processo completo de avaliação do modelo.
+    Configura e executa o processo de predição e avaliação.
 
-    Esta função serve como nossa "cola" das etapas para a avaliação,
-    chamando as funções para carregar dados, fazer predições e calcular
-    as métricas.
+    Esta função serve como ponto de entrada para o script, instanciando
+    a classe ``ModelEvaluator`` com os caminhos e parâmetros
+    necessários e, em seguida, invocando o método ``evaluate()`` para
+    executar todo o pipeline.
     """
-    model, X_train, X_test, y_train, y_test = load_data_and_artifacts()
-    y_train_proba_final, y_pred_proba_final, y_pred_final = make_predictions(
-        model, X_train, X_test
+    evaluator = ModelEvaluator(
+        model_path=MODEL_PATH,
+        x_train_path=X_TRAIN_IMPUTED_DATA_PATH,
+        x_test_path=X_TEST_IMPUTED_DATA_PATH,
+        y_train_path=Y_TRAIN_DATA_PATH,
+        y_test_path=Y_TEST_DATA_PATH,
+        top_features=TOP_FEATURES,
     )
 
-    calculate_metrics(
-        y_train, y_test, y_train_proba_final, y_pred_proba_final, y_pred_final
-    )
+    final_metrics = evaluator.evaluate()
+
+    print("\nDicionário de métricas:", final_metrics)
