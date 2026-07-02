@@ -17,15 +17,6 @@ import numpy as np
 from scipy.stats import ks_2samp
 from sklearn.metrics import roc_auc_score, precision_score, recall_score
 
-from src.fundamentos_engenharia_software.config import (
-    MODEL_PATH,
-    X_TRAIN_IMPUTED_DATA_PATH,
-    X_TEST_IMPUTED_DATA_PATH,
-    Y_TRAIN_DATA_PATH,
-    Y_TEST_DATA_PATH,
-    TOP_FEATURES,
-)
-
 
 class ModelEvaluator:
     """
@@ -147,26 +138,3 @@ class ModelEvaluator:
         self._make_predictions()
         self._calculate_metrics()
         return self.metrics
-
-
-def evaluate_model() -> None:
-    """
-    Configura e executa o processo de predição e avaliação.
-
-    Esta função serve como ponto de entrada para o script, instanciando
-    a classe ``ModelEvaluator`` com os caminhos e parâmetros
-    necessários e, em seguida, invocando o método ``evaluate()`` para
-    executar todo o pipeline.
-    """
-    evaluator = ModelEvaluator(
-        model_path=MODEL_PATH,
-        x_train_path=X_TRAIN_IMPUTED_DATA_PATH,
-        x_test_path=X_TEST_IMPUTED_DATA_PATH,
-        y_train_path=Y_TRAIN_DATA_PATH,
-        y_test_path=Y_TEST_DATA_PATH,
-        top_features=TOP_FEATURES,
-    )
-
-    final_metrics = evaluator.evaluate()
-
-    print("\nDicionário de métricas:", final_metrics)

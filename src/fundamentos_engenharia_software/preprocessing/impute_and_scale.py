@@ -26,15 +26,6 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from src.fundamentos_engenharia_software.config import (
-    PROCESSED_DATA_PATH,
-    X_TRAIN_IMPUTED_DATA_PATH,
-    X_TEST_IMPUTED_DATA_PATH,
-    Y_TRAIN_DATA_PATH,
-    Y_TEST_DATA_PATH,
-    COLS_TO_USE,
-)
-
 
 class MissingImputerScaler(BaseEstimator, TransformerMixin):
     """
@@ -201,7 +192,7 @@ class DataScalerAndImputer:
             )
             raise
 
-        X = data_with_features[COLS_TO_USE].drop(columns="fraude")
+        X = data_with_features[self.cols_to_use].drop(columns="fraude")
         y = data_with_features["fraude"]
 
         self.X_train, self.X_test, self.y_train, self.y_test = (
@@ -268,24 +259,3 @@ class DataScalerAndImputer:
         except (PermissionError, OSError) as e:
             print(f"Falha ao salvar os arquivos de treino/teste: {e}")
             raise
-
-
-def impute_and_scale() -> None:
-    """
-    Configura e executa o processo de escalonamento e imputação.
-
-    Esta função serve como ponto de entrada para o script, instanciando
-    a classe ``DataScalerAndImputer`` com os caminhos e parâmetros
-    necessários e, em seguida, invocando o método ``run()`` para
-    executar todo o pipeline.
-    """
-    scaler_and_imputer = DataScalerAndImputer(
-        input_path=PROCESSED_DATA_PATH,
-        output_x_train_path=X_TRAIN_IMPUTED_DATA_PATH,
-        output_x_test_path=X_TEST_IMPUTED_DATA_PATH,
-        output_y_train_path=Y_TRAIN_DATA_PATH,
-        output_y_test_path=Y_TEST_DATA_PATH,
-        cols_to_use=COLS_TO_USE,
-    )
-
-    scaler_and_imputer.run()

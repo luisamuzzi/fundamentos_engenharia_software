@@ -36,11 +36,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import LabelEncoder
 
-from src.fundamentos_engenharia_software.config import (
-    RAW_DATA_PATH,
-)
-from src.fundamentos_engenharia_software.config import PROCESSED_DATA_PATH
-
 
 class CategoryGrouper(BaseEstimator, TransformerMixin):
     """
@@ -372,19 +367,3 @@ class FeatureEngineer:
         self.processed_data = data_processed
 
         self.save_feature_engineer_results()
-
-
-def create_features_and_encode() -> None:
-    """
-    Configura e executa o processo de feature_engineering.
-
-    Esta função serve como ponto de entrada para o script, instanciando
-    a classe ``FeatureEngineer`` com os caminhos e parâmetros
-    necessários e, em seguida, invocando o método ``run_feature_engineer()`` para
-    executar todo o pipeline.
-    """
-    feature_engineer = FeatureEngineer(
-        input_path=RAW_DATA_PATH, output_path=PROCESSED_DATA_PATH
-    )
-
-    feature_engineer.run_feature_engineer()

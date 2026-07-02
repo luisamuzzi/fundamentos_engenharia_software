@@ -8,18 +8,16 @@ treinado para uso posterior na etapa de avaliação.
 """
 
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
 from joblib import dump
-
-from src.fundamentos_engenharia_software.config import (
-    X_TRAIN_IMPUTED_DATA_PATH,
-    Y_TRAIN_DATA_PATH,
-    MODEL_PATH,
-    TOP_FEATURES,
-)
+from sklearn.tree import DecisionTreeClassifier
 
 
-def train_model() -> None:
+from fundamentos_engenharia_software.config import TOP_FEATURES
+
+
+def train_model(
+    x_train_imputed_data_path: str, y_train_data_path: str, model_path: str
+) -> None:
     """
     Treina o modelo de árvore de decisão e o salva em disco.
 
@@ -29,12 +27,19 @@ def train_model() -> None:
     3. Instancia um modelo de Árvore de Decisão com hiperparâmetros pré-definidos.
     4. Treina o modelo com os dados de treino.
     5. Salva o objeto do modelo treinado no caminho especificado em MODEL_PATH.
+
+    :param x_train_imputed_data_path: Caminho do arquivo X_train_imputed
+    :type x_train_imputed_data_path: str
+    :param  y_train_data_path: Caminho do arquivo y_train
+    :type  y_train_data_path: str
+    :param model: Caminho onde o modelo será salvo.
+    :type model: str
     """
     try:
         print("Iniciando o treinamento do modelo.")
 
-        X_train = pd.read_csv(X_TRAIN_IMPUTED_DATA_PATH)
-        y_train = pd.read_csv(Y_TRAIN_DATA_PATH)
+        X_train = pd.read_csv(x_train_imputed_data_path)
+        y_train = pd.read_csv(y_train_data_path)
 
         X_train_top = X_train[TOP_FEATURES]
 
@@ -48,14 +53,13 @@ def train_model() -> None:
         )
 
         dt_model_top.fit(X_train_top, y_train)
-        print(f"Salvando o modelo treinado em {MODEL_PATH}")
+        print(f"Salvando o modelo treinado em {model_path}")
 
-        dump(dt_model_top, MODEL_PATH)
+        dump(dt_model_top, model_path)
         print("Modelo final salvo em 'modelo_final.joblib'.")
-
     except FileNotFoundError as e:
-        print(f"Arquivo de dados de treino não encontrado: {e}")
+        print(f"Arquivo de dados de treino não encontrado:{e}")
         raise
     except Exception as e:
-        print(f"Ocorreu um erro durante o treinamento {e}")
+        print(f"Ocorreu um erro durante o treinamento:{e}")
         raise
