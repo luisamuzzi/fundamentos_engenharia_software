@@ -1,0 +1,50 @@
+name: CI Base para Projeto de Fraude (Exemplo)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1. Checkout do repositório
+      uses: actions/checkout@v4
+
+    - name: 2. Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: 3. Instalar Poetry
+      run: pipx install poetry
+
+    - name: 4. Configurar cache de dependências do Poetry
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
+    - name: 5. Instalar dependências do projeto
+      # Roda da raiz do projeto, onde o pyproject.toml está
+      run: poetry install
+
+    - name: 6. Rodar Black (Verificador de Formatação)
+      # O ponto '.' aqui significa verificar todo o projeto (src, tests, etc.)
+      run: poetry run black src/fundamentos_engenharia_software --check
+
+    - name: 7. Rodar Pylint (Análise de Qualidade)
+      # Roda o Pylint no código fonte e nos testes
+      run: poetry run pylint src/fundamentos_engenharia_software tests --fail-under=9.0
+
+    - name: 8. Rodar Pytest (Testes Unitários)
+      # O Pytest, quando executado da raiz, descobre a pasta 'tests' automaticamente
+      run: poetry run pytest tests/
