@@ -1,5 +1,4 @@
-"""
-Módulo de configurações do projeto.
+"""Módulo de configurações do projeto.
 
 Este arquivo centraliza todas as variáveis de configuração, como caminhos de
 arquivos, diretórios e listas de features, para garantir consistência e
@@ -22,7 +21,7 @@ Parâmetros do Modelo
 - COLS_TO_USE: Lista de colunas a serem utilizadas do dataset original.
 - MODEL_PATH: Caminho completo para salvar/carregar o modelo treinado.
 - TOP_FEATURES: Lista das features mais importantes selecionadas para o
-                treinamento do modelo final.
+                  treinamento do modelo final.
 """
 
 import os
@@ -32,12 +31,13 @@ PROJECT_ROOT = os.path.abspath(
 )
 
 DATA_FOLDER = os.path.join(PROJECT_ROOT, "data")
+
 RAW_DATA_FOLDER = os.path.join(DATA_FOLDER, "raw")
 PROCESSED_DATA_FOLDER = os.path.join(DATA_FOLDER, "processed")
 
 RAW_DATA_PATH = os.path.join(RAW_DATA_FOLDER, "dados.xlsx")
 PROCESSED_DATA_PATH = os.path.join(
-    PROCESSED_DATA_FOLDER, "dados_com_feature.csv"
+    PROCESSED_DATA_FOLDER, "dados_com_features.csv"
 )
 
 X_TRAIN_IMPUTED_DATA_PATH = os.path.join(
@@ -70,7 +70,9 @@ COLS_TO_USE = [
     "fraude",
 ]
 
+
 ARTIFACTS_FOLDER = os.path.join(PROJECT_ROOT, "artifacts")
+
 MODEL_PATH = os.path.join(ARTIFACTS_FOLDER, "modelo_final.joblib")
 
 TOP_FEATURES = [

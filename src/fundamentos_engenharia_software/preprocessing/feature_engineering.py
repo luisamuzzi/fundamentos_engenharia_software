@@ -11,6 +11,7 @@ sequencial que aplica todas as transformações, lendo os dados brutos e
 salvando o resultado processado.
 
 Classes de Transformação:
+
 - CategoryGrouper: Agrupa categorias de produtos com baixa representatividade
   em uma única categoria "outros".
 - CountryGrouper: Agrupa países menos relevantes em uma categoria "Outros".
@@ -20,6 +21,7 @@ Classes de Transformação:
   LabelEncoder.
 
 Orquestrador:
+
 - FeatureEngineer: Gerencia a leitura, processamento via pipeline e salvamento
   dos dados.
 """
@@ -28,9 +30,9 @@ from __future__ import (
     annotations,
 )
 
+from typing import List, Optional
 import pandas as pd
 import numpy as np
-from typing import List, Optional
 
 from sklearn.pipeline import Pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -161,8 +163,11 @@ class CountryGrouper(BaseEstimator, TransformerMixin):
         self.countries_to_keep = countries_to_keep
 
     def fit(
-        self, X: pd.DataFrame, y: Optional[pd.Series] = None
+        self, _X: pd.DataFrame, _y: Optional[pd.Series] = None
     ) -> CountryGrouper:
+        """
+        Fit vazio, sem aprendizado necessário
+        """
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -194,8 +199,11 @@ class DocumentFeatureCreator(BaseEstimator, TransformerMixin):
     """
 
     def fit(
-        self, X: pd.DataFrame, y: Optional[pd.Series] = None
+        self, _X: pd.DataFrame, _y: Optional[pd.Series] = None
     ) -> DocumentFeatureCreator:
+        """
+        Fit vazio, sem aprendizado
+        """
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -237,7 +245,7 @@ class ColumnEncoder(BaseEstimator, TransformerMixin):
         self.columns_ = []
 
     def fit(
-        self, X: pd.DataFrame, y: Optional[pd.Series] = None
+        self, X: pd.DataFrame, _y: Optional[pd.Series] = None
     ) -> ColumnEncoder:
         """
         Ajusta um LabelEncoder para cada coluna do tipo 'object'.
@@ -299,6 +307,8 @@ class FeatureEngineer:
     """
 
     def __init__(self, input_path, output_path):
+        self.data = None
+        self.processed_data = None
 
         self.input_path = input_path
         self.output_path = output_path
@@ -329,11 +339,11 @@ class FeatureEngineer:
             print("Lendo os dados brutos.")
             self.data = pd.read_excel(self.input_path)
             print("Dados lidos com sucesso.")
-        except FileNotFoundError:
+        except FileNotFoundError as exc:
             print(
                 f"O Arquivo de entrada não foi encontrado: {self.input_path}"
             )
-            raise Exception
+            raise Exception from exc
         except Exception as e:
             print(f"Ocorreu um erro inesperado ao ler o arquivo de dados: {e}")
             raise

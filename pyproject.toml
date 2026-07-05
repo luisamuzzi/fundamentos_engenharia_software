@@ -56,4 +56,7 @@ good-names = [
         "X_test_imputed",
         "X_train_copy",
         "X_test_copy",
-        "X_train_top"]
+        "X_train_top",
+        'X_copy',
+        'X_invalid'
+        ]

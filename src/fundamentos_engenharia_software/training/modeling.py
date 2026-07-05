@@ -27,13 +27,6 @@ def train_model(
     3. Instancia um modelo de Árvore de Decisão com hiperparâmetros pré-definidos.
     4. Treina o modelo com os dados de treino.
     5. Salva o objeto do modelo treinado no caminho especificado em MODEL_PATH.
-
-    :param x_train_imputed_data_path: Caminho do arquivo X_train_imputed
-    :type x_train_imputed_data_path: str
-    :param  y_train_data_path: Caminho do arquivo y_train
-    :type  y_train_data_path: str
-    :param model: Caminho onde o modelo será salvo.
-    :type model: str
     """
     try:
         print("Iniciando o treinamento do modelo.")

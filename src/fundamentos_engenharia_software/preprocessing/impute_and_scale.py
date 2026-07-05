@@ -54,7 +54,7 @@ class MissingImputerScaler(BaseEstimator, TransformerMixin):
         self.scaler_ = None
         self.imputer_ = None
 
-    def fit(self, X: pd.DataFrame, y: Optional[pd.Series] = None):
+    def fit(self, X: pd.DataFrame, _y: Optional[pd.Series] = None):
         """
         Ajusta o ``MinMaxScaler`` e o ``KNNImputer`` com base nas colunas
         especificadas do conjunto de treino.
@@ -172,6 +172,17 @@ class DataScalerAndImputer:
         self.test_size = test_size
         self.random_state = random_state
         self.n_neighbors = n_neighbors
+
+        self.X_train = None
+        self.X_test = None
+        self.y_train = None
+        self.y_test = None
+
+        self.missing_columns = None
+        self.missing_transformer = None
+
+        self.X_train_imputed = None
+        self.X_test_imputed = None
 
     def _read_and_split_data(
         self,
