@@ -1,0 +1,49 @@
+name: Build and Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main 
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Necessário para fazer push para a branch gh-pages
+
+    steps:
+    - name: 1. Checkout do repositório
+      uses: actions/checkout@v4
+
+    - name: 2. Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: 3. Instalar Poetry
+      run: pipx install poetry
+
+    - name: 4. Configurar cache de dependências
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
+    - name: 5. Instalar dependências do projeto
+      run: poetry install --with dev # Instala também as de desenvolvimento (sphinx, etc)
+
+    - name: 6. Construir a documentação com Sphinx
+      run: poetry run sphinx-build -b html docs/source docs/_build/html
+
+    - name: 7. Deploy para GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      # Condição: Só executa em push para a branch principal
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs/_build/html
+        # As opções abaixo "limpam" a branch para garantir um deploy limpo (sem histórico de commit)
+        force_orphan: true

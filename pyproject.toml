@@ -6,7 +6,7 @@ authors = [
     {name = "Luisa Muzzi",email = "luisamuzzi29@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "optuna (>=4.5.0,<5.0.0)",
     "pandas (>=2.3.2,<3.0.0)",
@@ -32,7 +32,10 @@ build-backend = "poetry.core.masonry.api"
 [dependency-groups]
 dev = [
     "cookiecutter-data-science (>=2.3.0,<3.0.0)",
-    "black (>=26.5.1,<27.0.0)"
+    "black (>=26.5.1,<27.0.0)",
+    "sphinx (>=9.1.0,<10.0.0)",
+    "furo (>=2025.12.19,<2026.0.0)",
+    "sphinx-autodoc-typehints (>=3.12.1,<4.0.0)"
 ]
 
 

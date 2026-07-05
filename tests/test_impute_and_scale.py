@@ -1,3 +1,7 @@
+"""
+Módulo para testes unitários dos métodos de impute_and_scale.py
+"""
+
 import pytest
 import pandas as pd
 import numpy as np

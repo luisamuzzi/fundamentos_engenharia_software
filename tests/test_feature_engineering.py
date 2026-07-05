@@ -1,14 +1,17 @@
+"""
+Módulo para testes unitários dos métodos de feature_engineering.py
+"""
 import pandas as pd
 import numpy as np
 import pytest
 
 from fundamentos_engenharia_software.preprocessing.feature_engineering import (
     CategoryGrouper,
-    CountryGrouper, 
+    CountryGrouper,
     ColumnEncoder,
 )
 
-@pytest.fixture 
+@pytest.fixture
 def sample_dataframe() -> pd.DataFrame:
     """
     Fixture com dados para testar o CountryGrouper
@@ -31,7 +34,7 @@ def category_dataframe() -> pd.DataFrame:
         "categoria_produto": ["A", "B", "A", "C", "B", "A", "D"],
         "fraude": [1, 0, 1, 1, 0, 1, 0],
     }
-    return pd.DataFrame(data)   
+    return pd.DataFrame(data)
 
 
 def test_country_grouper_transform(sample_dataframe):
@@ -39,7 +42,6 @@ def test_country_grouper_transform(sample_dataframe):
     Testa CountryGrouper.
     """
     # Arrange
-    
     countries_to_keep = ['BR', 'AR']
     grouper = CountryGrouper(countries_to_keep=countries_to_keep)
 
@@ -97,7 +99,7 @@ def test_country_grouper_parametrized(
     result = grouper.transform(sample_dataframe)
 
     assert (
-        result['paises_agrupados'].value_counts().get('Outros', 0) 
+        result['paises_agrupados'].value_counts().get('Outros', 0)
         == expect_other_count
     )
 
@@ -127,7 +129,6 @@ def test_category_grouper_fit_raises_error_if_column_missing():
     """
 
     data = {"coluna_errada": ["A", "B", "C"], "fraude": [1, 0, 1]}
-    
     X_invalid = pd.DataFrame(data)
     y_invalid = X_invalid.pop("fraude")
     grouper = CategoryGrouper()
