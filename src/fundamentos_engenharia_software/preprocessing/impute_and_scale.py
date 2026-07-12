@@ -17,6 +17,7 @@ Classe Principal:
 - ``DataScalerAndImputer``: Orquestra todo o pipeline de pré-processamento.
 """
 
+import os
 from typing import List, Optional
 
 import pandas as pd
@@ -25,6 +26,8 @@ from sklearn.impute import KNNImputer
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
+
+from joblib import dump
 
 
 class MissingImputerScaler(BaseEstimator, TransformerMixin):
@@ -155,6 +158,7 @@ class DataScalerAndImputer:
         output_x_test_path: str,
         output_y_train_path: str,
         output_y_test_path: str,
+        artifacts_path: str,
         cols_to_use: List[str],
         test_size: float = 0.3,
         random_state: int = 42,
@@ -166,6 +170,8 @@ class DataScalerAndImputer:
         self.output_x_test_path = output_x_test_path
         self.output_y_train_path = output_y_train_path
         self.output_y_test_path = output_y_test_path
+
+        self.artifacts_path = artifacts_path
 
         self.cols_to_use = cols_to_use
 
@@ -252,6 +258,12 @@ class DataScalerAndImputer:
         self.X_train_imputed = self.missing_transformer.fit_transform(
             self.X_train
         )
+
+        dump(
+            self.missing_transformer,
+            os.path.join(self.artifacts_path, "imputer_scaler.joblib"),
+        )
+
         self.X_test_imputed = self.missing_transformer.transform(self.X_test)
 
         try:

@@ -30,6 +30,8 @@ from __future__ import (
     annotations,
 )
 
+import os
+
 from typing import List, Optional
 import pandas as pd
 import numpy as np
@@ -37,6 +39,8 @@ import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import LabelEncoder
+
+from joblib import dump
 
 
 class CategoryGrouper(BaseEstimator, TransformerMixin):
@@ -306,12 +310,13 @@ class FeatureEngineer:
     :vartype feature_pipeline: Pipeline
     """
 
-    def __init__(self, input_path, output_path):
+    def __init__(self, input_path, output_path, artifacts_path):
         self.data = None
         self.processed_data = None
 
         self.input_path = input_path
         self.output_path = output_path
+        self.artifacts_path = artifacts_path
         self.feature_pipeline = self._get_pipeline()
 
     def _get_pipeline(self) -> Pipeline:
@@ -373,6 +378,12 @@ class FeatureEngineer:
         X = self.data.drop(columns=["fraude"])
 
         data_processed = self.feature_pipeline.fit_transform(X, y)
+
+        dump(
+            self.feature_pipeline,
+            os.path.join(self.artifacts_path, "feature_engineer.joblib"),
+        )
+
         data_processed["fraude"] = y.values
         self.processed_data = data_processed
 
