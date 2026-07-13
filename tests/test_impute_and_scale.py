@@ -61,6 +61,9 @@ def test_read_and_split_data(dataframe_input_path, tmp_path):
     output_dir = tmp_path / "output"
     output_dir.mkdir()
 
+    artifacts_dir = tmp_path / "artifacts"
+    artifacts_dir.mkdir()
+
     df_temp = pd.read_csv(dataframe_input_path)
     cols_to_use = df_temp.columns.tolist()
 
@@ -70,6 +73,7 @@ def test_read_and_split_data(dataframe_input_path, tmp_path):
         output_x_test_path=str(output_dir / "x_test.csv"),
         output_y_train_path=str(output_dir / "y_train.csv"),
         output_y_test_path=str(output_dir / "y_test.csv"),
+        artifacts_path=str(artifacts_dir),
         cols_to_use=cols_to_use,
         test_size=0.2,
         random_state=42,
