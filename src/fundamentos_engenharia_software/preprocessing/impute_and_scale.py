@@ -18,6 +18,8 @@ Classe Principal:
 """
 
 import os
+import logging
+
 from typing import List, Optional
 
 import pandas as pd
@@ -28,6 +30,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from joblib import dump
+
+logger = logging.getLogger(__name__)
 
 
 class MissingImputerScaler(BaseEstimator, TransformerMixin):
@@ -204,8 +208,9 @@ class DataScalerAndImputer:
         try:
             data_with_features = pd.read_csv(self.input_path)
         except FileNotFoundError:
-            print(
-                f"Arquivo de dados processados não encontrado em {self.input_path}",
+            logger.error(
+                "Arquivo de dados processados não encontrado em %s",
+                self.input_path,
             )
             raise
 
@@ -267,7 +272,7 @@ class DataScalerAndImputer:
         self.X_test_imputed = self.missing_transformer.transform(self.X_test)
 
         try:
-            print("Salvando os conjuntos de treino e teste processados.")
+            logger.info("Salvando os conjuntos de treino e teste processados.")
             self.X_train_imputed.to_csv(
                 self.output_x_train_path,
                 index=False,
@@ -278,7 +283,7 @@ class DataScalerAndImputer:
             )
             self.y_train.to_csv(self.output_y_train_path, index=False)
             self.y_test.to_csv(self.output_y_test_path, index=False)
-            print("Arquivos salvos com sucesso.")
+            logger.info("Arquivos salvos com sucesso.")
         except (PermissionError, OSError) as e:
-            print(f"Falha ao salvar os arquivos de treino/teste: {e}")
+            logger.error("Falha ao salvar os arquivos de treino/teste: %s", e)
             raise

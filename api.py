@@ -1,4 +1,5 @@
 import os
+import logging
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -8,8 +9,13 @@ from typing import Optional
 import joblib
 
 from fundamentos_engenharia_software.config import TOP_FEATURES
+from fundamentos_engenharia_software.logging import setup_logging
 
 from main import run_training
+
+setup_logging()
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="API de predição de fraude",
@@ -72,7 +78,10 @@ def predict(data: TransactionData):
     input_scaled = imputer_scaler.transform(input_with_features)
 
     probability = model.predict_proba(input_scaled[TOP_FEATURES])[0][1]
-    prediction = model.predict(input_scaled[TOP_FEATURES])[0]
+    prediction = model.predict(input_scaled[TOP_FEATURES])
+
+    logger.info("Predição realizada")
+    logger.info(prediction)
 
     return {
         "prediction": int(prediction),

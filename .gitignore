@@ -185,4 +185,7 @@ exemplos/
 # Distribuição
 dist/
 
+# Logs
+logs/
+
 # End of https://www.toptal.com/developers/gitignore/api/python

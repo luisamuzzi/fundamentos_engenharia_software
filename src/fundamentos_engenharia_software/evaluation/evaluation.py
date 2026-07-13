@@ -10,12 +10,15 @@ Classes de Avaliação:
 
 """
 
+import logging
 from typing import Any, Dict
 import joblib
 import pandas as pd
 import numpy as np
 from scipy.stats import ks_2samp
 from sklearn.metrics import roc_auc_score, precision_score, recall_score
+
+logger = logging.getLogger(__name__)
 
 
 class ModelEvaluator:
@@ -77,19 +80,19 @@ class ModelEvaluator:
         Método privado para uso interno da classe.
         """
         try:
-            print(f"Carregando modelo de {self.model_path}")
+            logger.info("Carregando modelo de %s", self.model_path)
             self.model = joblib.load(self.model_path)
 
-            print("Carregando dados de treino e teste")
+            logger.info("Carregando dados de treino e teste")
             self.X_train = pd.read_csv(self.x_train_path)
             self.X_test = pd.read_csv(self.x_test_path)
             self.y_train = pd.read_csv(self.y_train_path).squeeze()
             self.y_test = pd.read_csv(self.y_test_path).squeeze()
         except FileNotFoundError as e:
-            print(f"Arquivo de modelo ou de dados não encontrado: {e}")
+            logger.error("Arquivo de modelo ou de dados não encontrado: %s", e)
             raise
         except Exception as e:
-            print(f"Falha ao carregar artefatos: {e}")
+            logger.error("Falha ao carregar artefatos: %s", e)
             raise
 
     def _make_predictions(self) -> None:
@@ -98,7 +101,7 @@ class ModelEvaluator:
         Método privado para uso interno da classe.
         """
 
-        print("Gerando predições...")
+        logger.info("Gerando predições...")
         self.y_train_proba = self.model.predict_proba(
             self.X_train[self.top_features]
         )[:, 1]
@@ -113,7 +116,7 @@ class ModelEvaluator:
         Método privado para uso interno da classe.
         """
 
-        print("Calculando métricas...")
+        logger.info("Calculando métricas...")
         ks_stat, ks_p_value = ks_2samp(
             self.y_pred_proba[self.y_test == 1],
             self.y_pred_proba[self.y_test == 0],

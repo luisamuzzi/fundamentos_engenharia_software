@@ -1,3 +1,5 @@
+import logging
+
 from fundamentos_engenharia_software.preprocessing.feature_engineering import (
     FeatureEngineer,
 )
@@ -9,6 +11,13 @@ from fundamentos_engenharia_software.training.modeling import train_model
 from fundamentos_engenharia_software.evaluation.evaluation import (
     ModelEvaluator,
 )
+
+from fundamentos_engenharia_software.logging import setup_logging
+
+setup_logging()
+
+logger = logging.getLogger(__name__)
+
 
 from fundamentos_engenharia_software.config import (
     RAW_DATA_PATH,
@@ -31,7 +40,7 @@ from fundamentos_engenharia_software.config import (
 
 def run_training():
     try:
-        print("Iniciando pipeline...")
+        logger.info("Iniciando pipeline...")
         feature_engineer = FeatureEngineer(
             input_path=RAW_DATA_PATH,
             output_path=PROCESSED_DATA_PATH,
@@ -65,11 +74,11 @@ def run_training():
 
         final_metrics = evaluator.evaluate()
 
-        print("\nDicionário de métricas:", final_metrics)
+        logger.info("\nDicionário de métricas: %s", final_metrics)
 
-        print("Pipeline finalizado com sucesso!")
+        logger.info("Pipeline finalizado com sucesso!")
     except Exception as e:
-        print(f"Ocorreu um erro e o pipeline foi interrompido: {e}")
+        logger.error(f"Ocorreu um erro e o pipeline foi interrompido: {e}")
 
 
 if __name__ == "__main__":

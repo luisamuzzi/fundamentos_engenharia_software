@@ -30,6 +30,7 @@ from __future__ import (
     annotations,
 )
 
+import logging
 import os
 
 from typing import List, Optional
@@ -41,6 +42,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import LabelEncoder
 
 from joblib import dump
+
+logger = logging.getLogger(__name__)
 
 
 class CategoryGrouper(BaseEstimator, TransformerMixin):
@@ -121,7 +124,9 @@ class CategoryGrouper(BaseEstimator, TransformerMixin):
                 produtos_categorias.categoria_produto.to_list()
             )
         except KeyError as e:
-            print(f"Erro no CategoryGrouper: Coluna {e} não encontrada.")
+            logger.error(
+                "Erro no CategoryGrouper: Coluna %s não encontrada.", e
+            )
             raise
 
         return self
@@ -341,27 +346,30 @@ class FeatureEngineer:
     def read_raw_data(self) -> None:
         """Lê os dados brutos do input_path e os armazena no atributo data."""
         try:
-            print("Lendo os dados brutos.")
+            logger.info("Lendo os dados brutos.")
             self.data = pd.read_excel(self.input_path)
-            print("Dados lidos com sucesso.")
+            logger.info("Dados lidos com sucesso.")
         except FileNotFoundError as exc:
-            print(
-                f"O Arquivo de entrada não foi encontrado: {self.input_path}"
+            logger.error(
+                "O Arquivo de entrada não foi encontrado: %s", self.input_path
             )
             raise Exception from exc
         except Exception as e:
-            print(f"Ocorreu um erro inesperado ao ler o arquivo de dados: {e}")
+            logger.error(
+                "Ocorreu um erro inesperado ao ler o arquivo de dados: %s", e
+            )
             raise
 
     def save_feature_engineer_results(self) -> None:
         """Salva o DataFrame processado (processed_data) no output_path."""
         try:
-            print("Salvando dados com features.")
+            logger.info("Salvando dados com features.")
             self.processed_data.to_csv(self.output_path, index=False)
-            print(f"Arquivo salvo em {self.output_path}")
+            logger.info("Arquivo salvo em %s", self.output_path)
         except PermissionError:
-            print(
-                f"Sem permissão para escrever o arquivo em: { self.output_path}"
+            logger.info(
+                "Sem permissão para escrever o arquivo em: %s",
+                self.output_path,
             )
             raise Exception
 
